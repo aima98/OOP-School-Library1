@@ -31,4 +31,5 @@ class Person < Nameable
 
   def add_rental(rental)
     @rentals << rental
+  end  
 end
