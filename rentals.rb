@@ -8,5 +8,8 @@ class Rental
 
     # a rental belongs to book
     @book.add_rental(self)
+
+    # rental belongs to person
+    @person.add_rental(self)
   end
 end
