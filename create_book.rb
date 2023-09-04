@@ -12,7 +12,7 @@ class CreateBook
     print 'Author: '
     author = gets.chomp
     book = Book.new(title, author)
-    books << book
+    @books << book
     puts ''
     puts '#=>  Book created successfully'
   end
