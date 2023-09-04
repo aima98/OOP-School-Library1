@@ -3,6 +3,7 @@ require './teacher'
 require './student'
 require './person'
 require './rentals'
+require './classroom'
 
 class Library
   attr_reader :books, :people, :rentals

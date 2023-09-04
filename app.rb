@@ -1,4 +1,5 @@
-require './classroom'
+require './library'
+require './create_book'
 
 class App
   attr_accessor :people, :rentals, :books
