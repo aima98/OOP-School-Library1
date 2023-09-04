@@ -89,6 +89,12 @@ To run tests, run the following command:
 - GitHub: [@aima98](https://github.com/aima98)
 - LinkedIn: [Oumaima Nejjari](https://www.linkedin.com/in/oumaimanejjari)
 
+👤 **John Murianki**
+
+- GitHub: [Tjay](https://github.com/tjay1760)
+- LinkedIn: [John Murianki](https://www.linkedin.com/in/john-murianki-thiongo/)
+- Twitter: [John Murianki](https://https://twitter.com/TjayPod)
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- FUTURE FEATURES -->
