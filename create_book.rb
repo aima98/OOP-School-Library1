@@ -1,3 +1,5 @@
+require './library'
+
 class CreateBook
   def initialize(library)
     @library = library

@@ -66,6 +66,10 @@ class App
     @library.create_person
   end
 
+  def create_book
+    @create_book.create_book
+  end
+
   def create_rental
     @library.create_rental
   end
