@@ -1,132 +1,69 @@
-require './book'
 require './classroom'
-require './teacher'
-require './student'
-require './person'
-require './rentals'
 
 class App
   attr_accessor :people, :rentals, :books
 
   def initialize
-    @people = []
-    @books = []
-    @rentals = []
+    @library = Library.new
+    @create_book = CreateBook.new(@library)
+  end
+
+  def options
+    puts ''
+    puts 'Welcome to School Library App!'
+    puts ''
+
+    puts '1 - List all books',
+         '2 - List all people',
+         '3 - Create a person',
+         '4 - Create a book',
+         '5 - Create a rental',
+         '6 - List all of rentals for a given person id',
+         '7 - Exit'
+    puts ''
+    puts 'Please choose an option by entering a number: '
+    print '#=> '
   end
 
   def list_all_books
-    puts '#=> No books are available yet' if books.empty?
-    books.each do |book|
-      puts "#=> Title: #{book.title} Author: #{book.author}"
-    end
-    puts people.length
+    @library.list_all_books
   end
 
   def list_all_people
-    puts '#=> No person is available yet' if people.empty?
-    people.each do |person|
-      puts "#=> [#{person.class}] ID: #{person.id} Name: #{person.name} Age: #{person.age}"
-    end
-    puts people.length
+    @library.list_all_people
   end
 
   def create_teacher
-    print "Teacher's specialization: "
-    specialization = gets.chomp
-    print 'Age: '
-    age = gets.chomp
-    print 'Name: '
-    name = gets.chomp
-    teacher = Teacher.new(specialization, age, name)
-    people << teacher
-    puts ''
-    puts '#=> Teacher created successfully'
+    @library.create_teacher
   end
 
   def create_student
-    print 'Age: '
-    age = Integer(gets.chomp)
-    print 'Name: '
-    name = gets.chomp
-    print 'Parent permission? [y/n]: '
-    parent_permission = gets.chomp.downcase
-
-    case parent_permission
-    when 'n'
-      people << Student.new(nil, age, name, parent_permission: false)
-    when 'y'
-      people << Student.new(nil, age, name, parent_permission: true)
-    else
-      '#=> Invalid option, please try again'
-    end
-
-    puts ''
-    puts '#=> Student created successfully'
+    @library.create_student
   end
 
   def create_person
-    puts 'What kind of person do you want to create?'
-    puts '1 - Student'
-    puts '2 - Teacher'
-    print 'Input number : '
-
-    person_type = Integer(gets.chomp)
-
-    case person_type
-    when 1
-      create_student
-    when 2
-      create_teacher
-    end
-  end
-
-  def create_book
-    print 'Title: '
-    title = gets.chomp
-    print 'Author: '
-    author = gets.chomp
-    book = Book.new(title, author)
-    books << book
-    puts ''
-    puts '#=>  Book created successfully'
+    @library.create_person
   end
 
   def create_rental
-    return if books.empty? || people.empty?
-
-    puts '#=> Select a book from the following list by number'
-
-    books.each.with_index(1) { |book, index| puts "#{index}) Title: #{book.title}, Author: #{book.author}" }
-    print '#=> Choose a book: '
-    selected_book = Integer(gets.chomp) - 1
-
-    puts '#=> Select a person from the following list by number (no id)'
-
-    people.each.with_index(1) do |person, index|
-      puts "#{index}) Name: #{person.name} Age: #{person.age} Id: #{person.id}"
-    end
-    print '#=> Choose a person: '
-    selected_person = Integer(gets.chomp) - 1
-
-    print 'Date: '
-    selected_date = gets.chomp.to_s
-
-    rentals << Rental.new(selected_date, books[selected_book], people[selected_person])
-
-    puts ''
-    print '#=>  Rental created successfully.'
+    @library.create_rental
   end
 
   def list_rentals
-    print '#=> Enter the Person ID: '
-    id = gets.chomp.to_i
+    @library.list_rentals
+  end
 
-    rentals.each do |rental|
-      if rental.person.id == id
-        puts "#=>  Date: #{rental.date}, Book: #{rental.book.title} Author: #{rental.book.author}"
-      else
-        puts '#=> Invalid id, please try again'
-      end
+  def main
+    app = App.new
+    loop do
+      options
+      num = gets.chomp
+      break if num == '7'
+
+      select_option(app, num)
+      puts "\n"
     end
+
+    puts 'Goodbye'
   end
 end
