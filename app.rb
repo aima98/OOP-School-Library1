@@ -2,7 +2,7 @@ require './library'
 require './create_book'
 
 class App
-  attr_accessor :people,  :books, :rentals
+  attr_accessor :people, :books, :rentals
 
   def initialize
     @library = Library.new
