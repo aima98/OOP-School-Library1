@@ -29,7 +29,7 @@ class App
     print '#=> '
   end
 
-  def select_option(app, num)
+  def select_option(app, num) # rubocop:disable Metrics/CyclomaticComplexity
     case num
     when '1'
       app.list_all_books
@@ -45,7 +45,7 @@ class App
       app.list_rentals
     when 7
       store_data(app)
-      app.stop  
+      app.stop
     else
       puts ''
       puts '#=> Invalid option.(InvalidInputError)'
