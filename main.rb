@@ -1,10 +1,10 @@
-require './app'
+require './menu'
 
 def main
   puts "\nWelcome to School Library App!\n"
 
-  app = App.new
-  app.main
+  menu = Menu.new
+  menu.display_list_of_options
 end
 
 main
