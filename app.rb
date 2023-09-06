@@ -1,100 +1,133 @@
-require './library'
-require './create_book'
-require './retrieve_data'
-require './storage'
+require './book'
+require './person'
+require './rental'
+require './teacher'
+require './student'
+require './classroom'
 
 class App
   attr_accessor :people, :books, :rentals
 
   def initialize
-    @library = Library.new
-    @create_book = CreateBook.new(@library)
-    retrieve_data(self)
+    @books = []
+    @people = []
+    @rentals = []
   end
 
-  def options
-    puts ''
-    puts 'Welcome to School Library App!'
-    puts ''
-
-    puts '1 - List all books',
-         '2 - List all people',
-         '3 - Create a person',
-         '4 - Create a book',
-         '5 - Create a rental',
-         '6 - List all of rentals for a given person id',
-         '7 - Exit'
-    puts ''
-    puts 'Please choose an option by entering a number: '
-    print '#=> '
-  end
-
-  def select_option(app, num) # rubocop:disable Metrics/CyclomaticComplexity
-    case num
-    when '1'
-      app.list_all_books
-    when '2'
-      app.list_all_people
-    when '3'
-      app.create_person
-    when '4'
-      app.create_book
-    when '5'
-      app.create_rental
-    when '6'
-      app.list_rentals
-    when 7
-      store_data(app)
-      app.stop
+  def list_of_books
+    if @books.empty?
+      puts 'No books available'
     else
-      puts ''
-      puts '#=> Invalid option.(InvalidInputError)'
+      @books.each_with_index do |book, i|
+        puts "#{i + 1} title: #{book.title} author: #{book.author}"
+      end
     end
   end
 
-  def list_all_books
-    @library.list_all_books
+  def list_of_people
+    if @people.empty?
+      puts 'There are no people'
+    else
+      @people.each_with_index do |person, i|
+        puts "#{i + 1} name: #{person.name} age: #{person.age} person_id: #{person.id}"
+      end
+    end
   end
 
-  def list_all_people
-    @library.list_all_people
+  def create_student(name, age)
+    classroom = get_user_input('Please Enter Student\'s Classroom: ')
+    parent_permission = get_user_input('Has parent permission? [Y/N]: ')
+
+    case parent_permission
+    when 'Y'
+      @people << Student.new(age, classroom, name, 'true')
+      puts 'Student created successfully!'
+    when 'N'
+      @people << Student.new(age, classroom, name, 'false')
+      puts 'Student created successfully!'
+    else
+      puts 'Invalid Input! Should be Y for yes or N for No'
+    end
   end
 
-  def create_teacher
-    @library.create_teacher
-  end
-
-  def create_student
-    @library.create_student
+  def create_teacher(age, specialization, name, permission)
+    @people << Teacher.new(age, specialization, name, permission)
+    puts 'Teacher created successfully'
   end
 
   def create_person
-    @library.create_person
+    puts 'Do you want to create a student or a Teacher?'
+    choice = get_user_input_as_int('Please Enter 1 for a student or 2 for a Teacher: ')
+    name = get_user_input('Please Enter Name: ')
+    age = get_user_input_as_int('Please Enter Age: ')
+
+    case choice
+    # when person being created is a student
+    when 1
+      create_student(name, age)
+
+    # when person being created is a teacher
+    when 2
+      specialization = get_user_input('Teacher\'s specialization: ')
+      # create a teacher
+      create_teacher(age, specialization, name, 'true')
+    else
+      puts 'Invalid Input! Should be 1 or 2'
+    end
   end
 
   def create_book
-    @create_book.create_book
+    title = get_user_input('Please Enter Book Title: ')
+    author = get_user_input('Please Enter Book Author: ')
+
+    @books.push(Book.new(title, author))
+    puts 'Book created successfully'
   end
 
   def create_rental
-    @library.create_rental
-  end
+    if @books.empty?
+      puts 'There are no books to rent'
+    else
+      puts 'Please select a book number from the following list:'
+      list_of_books
+      book_number = get_user_input_as_int('Book number: ') - 1
 
-  def list_rentals
-    @library.list_rentals
-  end
+      puts 'Please select a person by number (and not person_id) from the following list:'
+      list_of_people
+      person_number = get_user_input_as_int('Person Number: ') - 1
+      entered_date = get_user_input('Please Enter Today\'s Date, use format(YYYY-MM-DD eg.2022-12-13): ')
 
-  def main
-    app = App.new
-    loop do
-      options
-      num = gets.chomp
-      break if num == '7'
+      @rentals << Rental.new(entered_date, @books[book_number], @people[person_number])
 
-      select_option(app, num)
-      puts "\n"
+      puts 'Rental created successfully'
     end
+  end
 
-    puts 'Goodbye'
+  def rentals_by_person_id
+    if !@people.empty? && !@rentals.empty?
+      puts 'Please select person id from the following list of people:'
+      list_of_people
+      id = get_user_input_as_int('Person id: ')
+
+      @rentals.each do |rental|
+        return puts "No book found by person id #{id}" unless rental.person.id == id
+
+        puts "Book Name: #{rental.book.title} Book Author: #{rental.book.author} Date: #{rental.date}"
+      end
+    else
+      puts 'There are no rentals'
+    end
+  end
+
+  private
+
+  def get_user_input(message)
+    print message
+    gets.chomp
+  end
+
+  def get_user_input_as_int(message)
+    print message
+    gets.chomp.to_i
   end
 end
