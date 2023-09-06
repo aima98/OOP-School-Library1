@@ -35,7 +35,7 @@ def store_books(app)
     books.push(book_data) unless books.any? { |b| b[:title] == book.title && b[:author] == book.author }
   end
 
-  File.write('books.json', "#{JSON.generate(books)}\n")
+  File.write('book.json', "#{JSON.generate(books)}\n")
 end
 
 def store_rentals(app)
