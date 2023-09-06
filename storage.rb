@@ -1,93 +1,60 @@
-require 'json'
-require './app'
-require './book'
-require './teacher'
-require './student'
-require './rentals'
-require './person'
+def store_data(app)
+  store_people(app)
+  store_books(app)
+  store_rentals(app)
+end
 
-class Storage
-  def initialize(app)
-    @app = app
+def store_people(app)
+  people = []
+  storage = Set.new
+  app.people.each do |person|
+    identifier = "#{person.name}_#{person.age}"
+    identifier = "#{person.name}_#{person.specialization}" if person.instance_of?(Teacher)
+    next if storage.include?(identifier)
+
+    data = {
+      name: person.name,
+      age: person.age,
+      type: person.class
+    }
+
+    data[:parent_permission] = !person.parent_permission if person.instance_of?(Student)
+    data[:specialization] = person.specialization if person.instance_of?(Teacher)
+
+    people << data
+    storage.add(identifier)
   end
 
-  def save_people
-    return if @app.people.empty?
+  File.write('people.json', "#{JSON.generate(people)}\n")
+end
 
-    people_json = @app.people.map(&:as_json)
-    File.write('people.json', JSON.dump(people_json))
+def store_books(app)
+  books = []
+  app.books.each do |book|
+    book_data = { title: book.title, author: book.author }
+    books.push(book_data) unless books.any? { |b| b[:title] == book.title && b[:author] == book.author }
   end
 
-  def load_people
-    # handle case when people.json is not available
-    return unless File.exist?('people.json')
+  File.write('books.json', "#{JSON.generate(books)}\n")
+end
 
-    people_json = JSON.parse(File.read('people.json'))
-    people_json.each do |person|
-      if person['type'] == 'Student'
-        new_student = Student.new(person['age'], person['classroom'], person['name'], person['parent_permission'])
-        @app.people.push(new_student)
-      else
-        new_teacher = Teacher.new(person['age'], person['specialization'], person['name'])
-        @app.people.push(new_teacher)
-      end
+def store_rentals(app)
+  rentals = []
+  app.rentals.each do |rental|
+    rental_data = {
+      date: rental.date,
+      book: app.books.index(rental.book),
+      book_title: rental.book.title,
+      person: app.people.index(rental.person),
+      person_name: rental.person.name
+    }
+
+    next if rentals.any? do |r|
+      r[:date] == rental_data[:date] && r[:book] == rental_data[:book] && r[:person] == rental_data[:person]
     end
+
+    rentals.push(rental_data)
   end
 
-  def read_data
-    load_people
-    load_books
-    load_rentals
-  end
-
-  def write_data
-    save_people
-    save_books
-    save_rentals
-  end
-
-  def save_books
-    return if @app.books.empty?
-
-    books = @app.books.map(&:as_json)
-    File.write('books.json', JSON.dump(books))
-  end
-
-  def load_books
-    return unless File.exist?('books.json')
-
-    books = JSON.parse(File.read('books.json'))
-    books.each do |book|
-      new_book = Book.new(book['title'], book['author'])
-      @app.books.push(new_book)
-    end
-  end
-
-  def find_person(person_id)
-    @app.people.each { |people| return people if people.id == person_id }
-  end
-
-  def find_book(book_title)
-    @app.books.each { |book| return book if book.title == book_title }
-  end
-
-  def load_rentals
-    return unless File.exist?('rentals.json')
-
-    JSON.parse(File.read('rentals.json')).map do |rental|
-      date = rental['date']
-      person = find_person(rental['person_id'])
-      book = find_book(rental['book_title'])
-      new_rental = Rental.new(date, book, person[0])
-      @app.rentals.push(new_rental)
-    end
-  end
-
-  def save_rentals
-    rentals_json = []
-    @app.rentals.each do |rental|
-      rentals_json.push({ date: rental.date, person_id: rental.person.id, book_title: rental.book.title })
-    end
-    open('rentals.json', 'w') { |f| f << JSON.generate(rentals_json) }
-  end
+  File.write('rentals.json', "#{JSON.generate(rentals)}\n")
 end

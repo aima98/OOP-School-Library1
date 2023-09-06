@@ -1,12 +1,15 @@
 require './library'
 require './create_book'
+require './retrieve_data'
+require './storage'
 
 class App
-  attr_accessor :people,  :books, :rentals
+  attr_accessor :people, :books, :rentals
 
   def initialize
     @library = Library.new
     @create_book = CreateBook.new(@library)
+    retrieve_data(self)
   end
 
   def options
@@ -40,6 +43,9 @@ class App
       app.create_rental
     when '6'
       app.list_rentals
+    when 7
+      store_data(app)
+      app.stop  
     else
       puts ''
       puts '#=> Invalid option.(InvalidInputError)'
